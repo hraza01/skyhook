@@ -8,11 +8,20 @@ const { values, positionals } = parseArgs({
             type: "boolean",
             short: "v",
         },
+        version: {
+            type: "boolean",
+        },
+        help: {
+            type: "boolean",
+            short: "h",
+        },
     },
     allowPositionals: true,
 })
 
 export const verbose = values.verbose
+export const showVersion = values.version
+export const showHelp = values.help
 
 // Helper to get root dir based on arg or CWD
 export const ROOT_DIR = positionals[0]

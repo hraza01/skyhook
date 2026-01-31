@@ -1,8 +1,20 @@
 #!/usr/bin/env node
 
 import chalk from "chalk"
-import { intro, spinner, cancel } from "@clack/prompts"
-import { validateEnv, DAGS_DIR, verbose } from "./config.js"
+import { cancel } from "@clack/prompts"
+import {
+    validateEnv,
+    DAGS_DIR,
+    verbose,
+    showVersion,
+    showHelp,
+} from "./config.js"
+import {
+    showVersionInfo,
+    showHelpInfo,
+    showIntro,
+    createSpinner,
+} from "./cli.js"
 import { scanDags, selectDag } from "./dag_selection.js"
 import { validateGit } from "./git_validation.js"
 import { deployDag } from "./deploy.js"
@@ -16,19 +28,16 @@ async function main() {
         initLogger(verbose)
         logger.info("INIT", "Skyhook started")
 
+        // Handle --version flag
+        if (showVersion) showVersionInfo()
+
+        // Handle --help flag
+        if (showHelp) showHelpInfo()
+
         validateEnv()
+        showIntro()
 
-        intro(
-            chalk.bgCyan(
-                chalk.black("  Skyhook / Cloud Composer Deployment Utility  "),
-            ),
-        )
-
-        const s = spinner({
-            frames: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"].map(
-                (frame) => chalk.cyan(frame),
-            ),
-        })
+        const s = createSpinner()
 
         // 1. Scan
         const folders = scanDags(DAGS_DIR, s)
