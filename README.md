@@ -1,6 +1,10 @@
-# Sky Hook 🪂
+# Skyhook 🪂
 
-**Sky Hook** is a robust, interactive CLI tool for deploying Airflow DAGs to Google Cloud Composer. It replaces legacy bash scripts with a modern Node.js interface featuring Git validation, synchronized spinners, and a professional UI.
+**Skyhook** is a robust, interactive CLI tool for deploying Airflow DAGs to Google Cloud Composer. It replaces legacy bash scripts with a modern Node.js interface featuring Git validation, synchronized spinners, and a professional UI.
+
+## About
+
+> **Use Case**: Skyhook is optimized for development environments and teams where a full CI/CD pipeline is not yet established. While automated CI/CD remains the industry standard for production deployments, this utility provides a safe, structured, and efficient alternative for manual deployments, helping smaller teams iterate faster without sacrificing validation or safety.
 
 ## Features
 
@@ -12,23 +16,29 @@
 ## Prerequisites
 
 - **Node.js**: v20.5.0 or higher
-- **Google Cloud SDK**: `gsutil` must be installed and authenticated.
+- **Google Cloud SDK**: `gsutil` must be installed and **authenticated**.
 - **Git**: Must be installed and available in the PATH.
+- **Environment**: You must be inside your Composer's local Airflow development environment (project root) to run this tool.
 
 ## Installation
 
-1.  Clone this repository (or navigate to it):
-    ```bash
-    cd scripts/sky-hook
-    ```
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
+Install globally via NPM:
+
+```console
+$ npm install -g skyhook
+```
+
+## Updating
+
+To update to the latest version:
+
+```console
+$ npm update -g skyhook
+```
 
 ## Configuration
 
-Sky Hook requires two environment variables to function. It will **exit** if these are not provided.
+Skyhook requires two environment variables to function. It will **exit** if these are not provided.
 
 | Variable            | Description                                    |
 | :------------------ | :--------------------------------------------- |
@@ -40,26 +50,35 @@ Sky Hook requires two environment variables to function. It will **exit** if the
 ### Option 1: VS Code Task (Recommended)
 
 1.  Copy the example task configuration from `vscode-example/tasks.json` to your project's `.vscode/tasks.json`.
-2.  Update the `env` variables in `tasks.json` with your actual bucket and URL.
-3.  Run the task:
-    - Press `Cmd+Shift+P` on macOS or `Ctrl+Shift+P` on Windows/Linux
-    - Select **Tasks: Run Task**
-    - Choose **Deploy DAG to Cloud Composer**
+2.  Update the `env` variables in `tasks.json`.
+3.  Run the task **"Deploy DAG to Cloud Composer"**.
 
-### Option 2: Manual Execution
+### Option 2: CLI (Manual)
 
-You can run the script manually, but you must export the variables first:
+Navigate to your Airflow project root (where the `dags/` folder is) and run:
 
-```bash
-export GCS_BUCKET_NAME="<your-bucket-name>"
-export COMPOSER_URL_BASE="<your-composer-webserver-url-base>"
+```console
+$ export GCS_BUCKET_NAME="<your-bucket-name>"
+$ export COMPOSER_URL_BASE="<your-composer-webserver-url-base>"
 
-# Run from the project root (recommended)
-node scripts/sky-hook/deploy.js
+$ skyhook
 ```
 
 ## Project Structure
 
-- `deploy.js`: The main Node.js entry point (handles UI and validation).
-- `deploy_core.sh`: Minimal shell wrapper for `gsutil rsync`.
+- `src/`: Source code modules.
+    - `index.js`: Main entry point.
+    - `config.js`: Configuration and environment validation.
+    - `dag_selection.js`: Logic for scanning and selecting DAGs.
+    - `git_validation.js`: Git validation logic.
+    - `deploy.js`: Orchestrates deployment and logs.
+    - `utils.js`: Helper functions (e.g., file counting).
+    - `logger.js`: Structured logging module.
+    - `quotes.js`: Random quote fetching.
+- `shell/`: Shell scripts.
+    - `deploy_core.sh`: Minimal shell wrapper for `gsutil rsync`.
 - `vscode-example/`: Contains template configuration files.
+
+## Thank You
+
+Thank you for your attention and for taking the time to read the documentation! We hope this tool helps streamline your workflow.
