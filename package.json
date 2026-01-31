@@ -4,7 +4,7 @@
     "description": "Interactive CLI for Cloud Composer DAG deployment",
     "main": "src/index.js",
     "bin": {
-        "skyhook": "./src/index.js"
+        "skyhook": "src/index.js"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
