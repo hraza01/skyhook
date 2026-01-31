@@ -1,25 +1,25 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Deploy DAG to Cloud Composer",
-      "type": "shell",
-      "command": "node scripts/sky-hook/deploy.js ${workspaceFolder}",
-      "problemMatcher": [],
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "dedicated",
-        "showReuseMessage": true,
-        "clear": true
-      },
-      "options": {
-        "env": {
-          "GCS_BUCKET_NAME": "<your-bucket-name>",
-          "COMPOSER_URL_BASE": "<your-composer-url-base>"
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Deploy DAG to Cloud Composer",
+            "type": "shell",
+            "command": "skyhook ${workspaceFolder}",
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "options": {
+                "env": {
+                    "GCS_BUCKET_NAME": "<your-bucket-name>",
+                    "COMPOSER_URL_BASE": "<your-composer-url-base>"
+                }
+            }
         }
-      }
-    }
-  ]
+    ]
 }
