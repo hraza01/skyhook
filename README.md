@@ -66,18 +66,9 @@ $ skyhook
 
 ## Project Structure
 
-- `src/`: Source code modules.
-    - `index.js`: Main entry point.
-    - `config.js`: Configuration and environment validation.
-    - `dag_selection.js`: Logic for scanning and selecting DAGs.
-    - `git_validation.js`: Git validation logic.
-    - `deploy.js`: Orchestrates deployment and logs.
-    - `utils.js`: Helper functions (e.g., file counting).
-    - `logger.js`: Structured logging module.
-    - `quotes.js`: Random quote fetching.
-- `shell/`: Shell scripts.
-    - `deploy_core.sh`: Minimal shell wrapper for `gsutil rsync`.
-- `vscode-example/`: Contains template configuration files.
+For a detailed overview of the project structure and module descriptions, see:
+
+📄 **[Project Structure Documentation](https://github.com/hraza01/skyhook/blob/main/docs/project-structure.md)**
 
 ## Thank You
 
