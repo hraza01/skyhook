@@ -1,5 +1,5 @@
 {
-    "name": "skyhook",
+    "name": "@hraza01/skyhook",
     "version": "1.0.0",
     "description": "Interactive CLI for Cloud Composer DAG deployment",
     "main": "src/index.js",
@@ -9,10 +9,21 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "keywords": [
+        "airflow",
+        "cloud-composer",
+        "dag",
+        "deployment",
+        "cli",
+        "gcp"
+    ],
+    "author": "Hasan Raza",
+    "license": "MIT",
     "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hraza01/skyhook.git"
+    },
     "dependencies": {
         "@clack/prompts": "^1.0.0",
         "chalk": "^5.6.2",

@@ -25,7 +25,7 @@
 Install globally via NPM:
 
 ```console
-$ npm install -g skyhook
+$ npm install -g @hraza01/skyhook
 ```
 
 ## Updating
@@ -33,7 +33,7 @@ $ npm install -g skyhook
 To update to the latest version:
 
 ```console
-$ npm update -g skyhook
+$ npm update -g @hraza01/skyhook
 ```
 
 ## Configuration
