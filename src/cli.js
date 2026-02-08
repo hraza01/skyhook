@@ -1,14 +1,24 @@
+import fs from "fs"
+import path from "path"
+import { fileURLToPath } from "url"
 import chalk from "chalk"
 import { intro } from "@clack/prompts"
 import ora from "ora"
 import terminalLink from "terminal-link"
 import figlet from "figlet"
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const packageJson = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "../package.json"), "utf-8"),
+)
+const { version } = packageJson
+
 /**
  * Display version information
  */
 export function showVersionInfo() {
-    console.log("skyhook v1.0.0")
+    console.log(`skyhook v${version}`)
     process.exit(0)
 }
 
