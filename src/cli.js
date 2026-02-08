@@ -13,6 +13,12 @@ const packageJson = JSON.parse(
     fs.readFileSync(path.join(__dirname, "../package.json"), "utf-8"),
 )
 const { version } = packageJson
+const authorName = "@hraza01"
+
+const gitLink = terminalLink(
+    chalk.dim(authorName),
+    `https://github.com/${authorName.replace("@", "")}/skyhook`,
+)
 
 /**
  * Display version information
@@ -26,11 +32,6 @@ export function showVersionInfo() {
  * Display help information
  */
 export function showHelpInfo() {
-    const gitLink = terminalLink(
-        chalk.cyan.underline("@hraza01/skyhook"),
-        "https://github.com/hraza01/skyhook",
-    )
-
     console.clear()
     console.log(
         chalk.cyan.bold("\nSkyhook - Cloud Composer DAG Deployment Utility\n"),
@@ -58,7 +59,7 @@ export function showHelpInfo() {
 export function showIntro() {
     console.clear()
     console.log(
-        chalk.cyan(
+        chalk.bold.cyan(
             figlet.textSync("Skyhook", {
                 font: "Slant",
                 horizontalLayout: "default",
@@ -66,8 +67,18 @@ export function showIntro() {
             }),
         ),
     )
+
+    const title = " Cloud Composer DAG Deployment Utility "
+    const titleLength = title.length + 3
+    const versionLength = `v${version}`.length
+    const authorLength = `by ${authorName}`.length
+    const padding = " ".repeat(
+        Math.max(0, titleLength - authorLength - versionLength),
+    )
+
+    console.log(chalk.dim.blackBright(`by ${gitLink}${padding}v${version}`))
     console.log("")
-    intro(chalk.bgCyan.black(" Cloud Composer DAG Deployment Utility "))
+    intro(chalk.bgCyan.black(title))
 }
 
 /**
