@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 import chalk from "chalk"
-import { cancel } from "@clack/prompts"
+import { cancel, log } from "@clack/prompts"
 import {
     validateEnv,
     DAGS_DIR,
     verbose,
     showVersion,
     showHelp,
+    skipGit,
 } from "./config.js"
 import {
     showVersionInfo,
@@ -24,7 +25,6 @@ import path from "path"
 
 async function main() {
     try {
-        console.clear()
         initLogger(verbose)
         logger.info("INIT", "Skyhook started")
 
@@ -37,25 +37,28 @@ async function main() {
         validateEnv()
         showIntro()
 
+        log.info("Looking for DAGs in:")
+        console.log(`${chalk.gray("│")}  ${chalk.dim(DAGS_DIR)}`)
+        log.warn(chalk.dim("Press Ctrl+C to exit at any time."))
+
         const s = createSpinner()
 
-        // 1. Scan
         const folders = scanDags(DAGS_DIR, s)
 
-        // 2. Select
         const selectedFolder = await selectDag(folders)
         const sourcePath = path.join(DAGS_DIR, selectedFolder)
 
-        // 3. Validate
-        await validateGit(sourcePath, s)
+        if (skipGit) {
+            logger.info("GIT", "Skipping Git validation (--no-git)")
+        } else {
+            await validateGit(sourcePath, s)
+        }
 
-        // 4. Deploy
         await deployDag(selectedFolder, sourcePath, s, verbose)
 
-        // 5. Post-Deployment Polish
         const quote = await fetchQuote()
         if (quote) {
-            console.log(chalk.italic.dim(`\n${quote}\n`))
+            console.log(chalk.italic.dim(`${quote}\n`))
         }
     } catch (error) {
         if (error.name === "UserCancellationError") {

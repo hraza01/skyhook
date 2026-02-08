@@ -6,3 +6,5 @@ vscode-example/
 docs/
 *.log
 .DS_Store
+.vscode/
+dags/

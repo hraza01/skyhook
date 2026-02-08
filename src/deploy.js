@@ -1,7 +1,7 @@
 import { execa } from "execa"
 import chalk from "chalk"
 import path from "path"
-import { cancel, outro } from "@clack/prompts"
+import { cancel, outro, log } from "@clack/prompts"
 import terminalLink from "terminal-link"
 import { fileURLToPath } from "url"
 import { countFiles } from "./utils.js"
@@ -86,7 +86,8 @@ export async function deployDag(selectedFolder, sourcePath, s, verbose) {
         })
 
         await subprocess
-        s.stop("GCS sync complete.")
+        s.clear()
+        log.success("GCS sync complete.")
 
         // Show Summary
         const fileCount = countFiles(sourcePath)
@@ -101,43 +102,44 @@ export async function deployDag(selectedFolder, sourcePath, s, verbose) {
             productionUrl,
         )
 
-        console.log("")
-        console.log(chalk.green("Deployment Summary"))
-        console.log("")
+        // Using console.log for body items to avoid clack's extra spacing
+        // Adding a small indentation to align visually
+        const indent = `${chalk.gray("│")}   `
+
+        log.success(chalk.bold.bgGreen(" Deployment Summary "))
+        console.log(indent)
 
         console.log(
-            `${chalk.dim(pad("Source", labelWidth))} ${chalk.reset(
+            `${indent}${chalk.dim(pad("Source", labelWidth))} ${chalk.reset(
                 `dags/${selectedFolder}`,
             )}`,
         )
         console.log(
-            `${chalk.dim(pad("Destination", labelWidth))} ${chalk.reset(
+            `${indent}${chalk.dim(pad("Destination", labelWidth))} ${chalk.reset(
                 `${BUCKET_URL}/${selectedFolder}`,
             )}`,
         )
         console.log(
-            `${chalk.dim(pad("Files Synced", labelWidth))} ${chalk.reset(
+            `${indent}${chalk.dim(pad("Files Synced", labelWidth))} ${chalk.reset(
                 `${fileCount} files`,
             )}`,
         )
-
-        console.log("")
         console.log(
+            `${indent}${chalk.dim(pad("Composer URL", labelWidth))} ${link}`,
+        )
+
+        log.info(
             chalk.white(
                 `${chalk.bold(
                     selectedFolder,
                 )} is now in sync with git + Cloud Composer.`,
             ),
         )
-        console.log("")
 
-        // Print URL in original location but single line
-        console.log(chalk.dim(pad("Composer URL", labelWidth)) + link)
-        console.log("")
-
-        outro(chalk.green.bold("Deployment Successful!"))
+        outro(chalk.green.bold("Deployment Successful."))
         logger.info("DEPLOY", "Deployment steps completed successfully.")
     } catch (error) {
+        // ... (rest of catch block) ...
         logger.error("DEPLOY", `Deployment failed: ${error.message}`)
         s.stop("Deployment Failed ❌", 1)
         console.log(chalk.red("\nError Logs:"))

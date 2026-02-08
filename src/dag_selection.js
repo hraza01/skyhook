@@ -1,32 +1,36 @@
 import fs from "fs"
 import path from "path"
-import { select, isCancel } from "@clack/prompts"
+import { select, isCancel, log } from "@clack/prompts"
 import { logger } from "./logger.js"
 import { UserCancellationError } from "./errors.js"
+import chalk from "chalk"
 
 export function scanDags(dagsDir, s) {
-    logger.info("SCAN", `Scanning directory: ${dagsDir}`)
-    s.start(`Looking for DAGs in: ${path.relative(process.cwd(), dagsDir)}`)
+    s.start("Scanning for DAGs...")
 
     if (!fs.existsSync(dagsDir)) {
-        s.stop(`Directory '${dagsDir}' not found.`, 1)
-        throw new UserCancellationError("Operation cancelled.")
+        s.stop("No DAGs directory found.", 1)
+        throw new Error(`DAGs directory not found: ${dagsDir}`)
     }
 
-    const folders = fs.readdirSync(dagsDir).filter((file) => {
+    const items = fs.readdirSync(dagsDir)
+    const folders = items.filter((item) => {
+        const fullPath = path.join(dagsDir, item)
         return (
-            fs.statSync(path.join(dagsDir, file)).isDirectory() &&
-            !file.startsWith(".")
+            fs.statSync(fullPath).isDirectory() &&
+            !item.startsWith(".") &&
+            !item.startsWith("__")
         )
     })
 
     if (folders.length === 0) {
-        s.stop(`No folders found in ${dagsDir}`, 1)
-        throw new UserCancellationError("Operation cancelled.")
+        s.stop("No DAG folders found.", 1)
+        throw new Error("No DAG folders found in dags/ directory.")
     }
 
-    s.stop(`Found ${folders.length} Airflow DAGs.`)
-    logger.info("SCAN", `Found ${folders.length} valid DAG folders.`)
+    s.clear() // Stop spinner and clear line
+    log.success(`Found ${folders.length} Airflow DAGs.`)
+
     return folders
 }
 

@@ -8,11 +8,26 @@ export function countFiles(dir) {
         file = path.resolve(dir, file)
         const stat = fs.statSync(file)
         if (stat && stat.isDirectory()) {
-            if (!file.includes(".git") && !file.includes("__pycache__")) {
+            if (
+                !file.includes(".git") &&
+                !file.includes("__pycache__") &&
+                !file.includes("tests") &&
+                !file.includes(".github")
+            ) {
                 results += countFiles(file)
             }
         } else {
-            results += 1
+            const filename = path.basename(file)
+            const ignoredFiles = [
+                "pyproject.toml",
+                "README.md",
+                "Makefile",
+                ".gitignore",
+                ".pre-commit-config.yaml",
+            ]
+            if (!ignoredFiles.includes(filename)) {
+                results += 1
+            }
         }
     })
     return results

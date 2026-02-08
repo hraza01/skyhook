@@ -20,8 +20,20 @@ fi
 echo "Syncing $SOURCE_PATH to $DEST_PATH..."
 
 # Calculate file count (informational)
-FILE_COUNT=$(find "$SOURCE_PATH" -type f -not -path '*/.git/*' -not -path '*/__pycache__/*' | wc -l | tr -d ' ')
+FILE_COUNT=$(find "$SOURCE_PATH" -type f \
+    -not -path '*/.git/*' \
+    -not -path '*/__pycache__/*' \
+    -not -path '*/tests/*' \
+    -not -path '*/.github/*' \
+    -not -name 'pyproject.toml' \
+    -not -name 'README.md' \
+    -not -name 'Makefile' \
+    -not -name '.gitignore' \
+    -not -name '.pre-commit-config.yaml' \
+    | wc -l | tr -d ' ')
 echo "Uploading $FILE_COUNT files..."
 
 # Perform Sync
-gsutil -m rsync -r -x "\.git/.*|__pycache__/.*" "$SOURCE_PATH" "$DEST_PATH"
+# Excludes: .git, __pycache__, tests, .github, and specific project files
+EXCLUDE_REGEX="\.git/.*|__pycache__/.*|tests/.*|\.github/.*|pyproject\.toml$|README\.md$|Makefile$|\.gitignore$|\.pre-commit-config\.yaml$"
+gsutil -m rsync -r -x "$EXCLUDE_REGEX" "$SOURCE_PATH" "$DEST_PATH"

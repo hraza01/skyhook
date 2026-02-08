@@ -1,38 +1,65 @@
 import { execa } from "execa"
 import chalk from "chalk"
 import { ValidationError } from "./errors.js"
+import { log } from "@clack/prompts"
 
 export async function validateGit(sourcePath, s) {
+    console.log(chalk.gray("│"))
     s.start("Validating Git status...")
 
-    // A. Check if valid git repo
+    // A. Check if it is a connected git repo
     try {
-        await execa("git", [
-            "-C",
-            sourcePath,
-            "rev-parse",
-            "--is-inside-work-tree",
-        ])
+        await execa("git", ["-C", sourcePath, "status"])
     } catch (e) {
-        s.stop("Validation Failed: Not a git repository.", 1)
-        throw new ValidationError("The DAG folder must be version controlled.")
+        s.stop("Validation Failed", 1)
+        throw new ValidationError("Directory is not a Git repository.")
     }
 
     // B. Check Branch Name
-    const { stdout: branch } = await execa("git", [
-        "-C",
-        sourcePath,
-        "rev-parse",
-        "--abbrev-ref",
-        "HEAD",
-    ])
-    if (branch.trim() !== "main") {
-        s.stop(`Validation Failed: You are on branch '${branch.trim()}'.`, 1)
-        throw new ValidationError("You must be on the 'main' branch to deploy.")
+    let branch
+    try {
+        const { stdout } = await execa("git", [
+            "-C",
+            sourcePath,
+            "rev-parse",
+            "--abbrev-ref",
+            "HEAD",
+        ])
+        branch = stdout.trim()
+    } catch (e) {
+        // Handle "ambiguous argument 'HEAD'" which happens in a fresh repo with no commits
+        if (e.message.includes("ambiguous argument 'HEAD'")) {
+            s.stop(
+                "Validation Failed: No commits found. Please commit your changes.",
+                1,
+            )
+            throw new ValidationError("Git repository has no commits.")
+        }
+        throw e
     }
 
-    // C. Check Sync Status
-    s.message("Checking remote sync status...")
+    if (branch !== "main") {
+        s.stop("Validation Failed", 1)
+        throw new ValidationError(
+            `You are on branch "${branch}". Please switch to "main".`,
+        )
+    }
+
+    // C. Check for Uncommitted Changes
+    const { stdout: statusOutput } = await execa("git", [
+        "-C",
+        sourcePath,
+        "status",
+        "--porcelain",
+    ])
+    if (statusOutput.trim() !== "") {
+        s.stop("Validation Failed", 1)
+        throw new ValidationError(
+            "You have uncommitted changes. Please commit or stash them.",
+        )
+    }
+
+    // D. Check Sync Status (Pull/Push)
     await execa("git", ["-C", sourcePath, "fetch", "origin", "main"])
 
     const { stdout: localHash } = await execa("git", [
@@ -49,7 +76,8 @@ export async function validateGit(sourcePath, s) {
     ])
 
     if (localHash.trim() !== remoteHash.trim()) {
-        s.stop("Validation Failed: Branch is out of sync with origin/main.", 1)
+        s.stop()
+        log.error("Validation Failed: Branch is out of sync with origin/main.")
 
         // Optional: Show ahead/behind info
         try {
@@ -71,5 +99,6 @@ export async function validateGit(sourcePath, s) {
         throw new ValidationError("Please pull/push changes before deploying.")
     }
 
-    s.stop("Git validation passed (main branch, in sync).")
+    s.clear()
+    log.success("Git validation passed (main branch, in sync).")
 }
